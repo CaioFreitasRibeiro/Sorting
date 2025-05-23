@@ -12,8 +12,8 @@
             _assignments = 0;
             _swaps = 0;
 
-            assignments = 0; // Inicializa antes da chamada interna
-            swaps = 0;       // Inicializa antes da chamada interna
+            assignments = 0;
+            swaps = 0;
 
             if (array == null || array.Length < 2)
             {
@@ -29,47 +29,45 @@
         {
             if (low < high)
             {
-                _comparisons++; // low < high
+                _comparisons++;
                 int pi = Partition(array, low, high);
                 InternalSort(array, low, pi - 1);
                 InternalSort(array, pi + 1, high);
             }
             else
             {
-                _comparisons++; // low < high (condição que falhou)
+                _comparisons++;
             }
         }
 
         private static int Partition(int[] array, int low, int high)
         {
             int pivot = array[high];
-            _assignments++; // pivot = array[high]
+            _assignments++;
             int i = (low - 1);
-            _assignments++; // i = (low - 1)
+            _assignments++;
 
             for (int j = low; j < high; j++)
             {
-                _comparisons++; // j < high
-                _comparisons++; // array[j] <= pivot
+                _comparisons++;
+                _comparisons++;
                 if (array[j] <= pivot)
                 {
                     i++;
-                    _assignments++; // i++
-                    // Troca de array[i] e array[j]
+                    _assignments++;
                     int temp = array[i];
                     array[i] = array[j];
                     array[j] = temp;
-                    _assignments += 3; // temp, array[i], array[j]
+                    _assignments += 3;
                     _swaps++;
                 }
             }
-            _comparisons++; // j < high (condição final)
+            _comparisons++;
 
-            // Troca de array[i+1] e array[high] (pivot)
             int temp1 = array[i + 1];
             array[i + 1] = array[high];
             array[high] = temp1;
-            _assignments += 3; // temp1, array[i+1], array[high]
+            _assignments += 3;
             _swaps++;
 
             return i + 1;

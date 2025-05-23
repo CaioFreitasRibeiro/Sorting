@@ -3,12 +3,12 @@
     class Pilha
     {
         public int[] pilha;
-        public int topo; // guarda a posição do elemento do topo
+        public int topo;
 
         public Pilha(int n)
         {
             pilha = new int[n];
-            topo = -1; // posição inválida
+            topo = -1;
         }
 
         public bool Inserir(int item)
@@ -28,18 +28,15 @@
 
         public int Remover()
         {
-            if (topo != -1)
-            {
-                int tmp = pilha[topo];
-                pilha[topo] = -1;
-                topo--;
-                return tmp;
-            }
-            else
+            if (topo == -1)
             {
                 Console.WriteLine("Pilha vazia, por isso não é possível remover elemento.");
                 return -1;
             }
+            int tmp = pilha[topo];
+            pilha[topo] = -1;
+            topo--;
+            return tmp;
         }
 
         public void Mostrar()

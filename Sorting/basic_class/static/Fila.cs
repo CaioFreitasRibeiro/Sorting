@@ -27,6 +27,11 @@
 
         public int Remover()
         {
+            if (cont == 0)
+            {
+                Console.WriteLine("Fila vazia, por isso não é possível remover elemento.");
+                return -1;
+            }
             int tmp = fila[0];
             for (int i = 0; i < cont - 1; i++)
             {

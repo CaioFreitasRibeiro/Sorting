@@ -14,7 +14,7 @@ using Sorting.sorting.specials;
 
 public class Program
 {
-    private const string SPECIFIC_INPUT_FILE = "1000000-aleatorios.txt";
+    private const string SPECIFIC_INPUT_FILE = "1000000-ordenados.txt";
 
     public static void Main(string[] args)
     {
@@ -29,9 +29,9 @@ public class Program
         }
 
         string[] allInputFiles = Directory.GetFiles(inputDirectory, "*.txt")
-                                        .Select(Path.GetFileName)
-                                        .OrderBy(f => f)
-                                        .ToArray();
+                                             .Select(Path.GetFileName)
+                                             .OrderBy(f => f)
+                                             .ToArray();
 
         Dictionary<string, Sortings> algorithmMap = new Dictionary<string, Sortings>
         {
@@ -47,7 +47,6 @@ public class Program
             { "BucketSort", Sortings.BUCKETSORT }
         };
 
-        // Tuple para armazenar (Algoritmo, Arquivo, TempoMs, Comparacoes, Atribuicoes, Trocas)
         List<Tuple<string, string, long, long, long, long>> results = new List<Tuple<string, string, long, long, long, long>>();
 
         while (true)
@@ -57,7 +56,8 @@ public class Program
             Console.WriteLine("2. Selecionar arquivo e algoritmo específicos (apenas tempo)");
             Console.WriteLine($"3. Contar Comparações para '{SPECIFIC_INPUT_FILE}' (tempo e comparações)");
             Console.WriteLine($"4. Contar Atribuições e Trocas para '{SPECIFIC_INPUT_FILE}' (tempo, atribuições e trocas)");
-            Console.WriteLine("5. Sair");
+            Console.WriteLine("5. Testar Fila e Pilha Estáticas com '100-aleatorios.txt'");
+            Console.WriteLine("6. Sair");
 
             string choice = Console.ReadLine();
 
@@ -99,6 +99,10 @@ public class Program
             }
             else if (choice == "5")
             {
+                RunQueueStackTest(inputDirectory);
+            }
+            else if (choice == "6")
+            {
                 break;
             }
             else
@@ -114,7 +118,7 @@ public class Program
 
     private static void RunPerformanceTest(string[] inputFilesToTest, Dictionary<string, Sortings> algorithmMap, string inputDirectory, List<Tuple<string, string, long, long, long, long>> results, MetricType metricType, bool specificFile = false)
     {
-        string currentFileName = ""; // Para usar no RunSpecificTest
+        string currentFileName = "";
         if (specificFile)
         {
             Console.WriteLine("\nArquivos de entrada disponíveis:");
@@ -129,15 +133,15 @@ public class Program
                 return;
             }
             currentFileName = inputFilesToTest[fileIndex - 1];
-            inputFilesToTest = new string[] { currentFileName }; // Testa apenas o arquivo selecionado
+            inputFilesToTest = new string[] { currentFileName };
         }
 
 
-        string currentAlgName = ""; // Para usar no RunSpecificTest
+        string currentAlgName = "";
         Sortings currentSortEnum = Sortings.BUBBLESORT;
         bool specificAlg = false;
 
-        if (specificFile) // Se o modo é de arquivo específico, permita escolher algoritmo
+        if (specificFile)
         {
             Console.WriteLine("\nAlgoritmos de ordenação disponíveis:");
             List<string> algNames = algorithmMap.Keys.ToList();
@@ -167,8 +171,8 @@ public class Program
             if (originalArray == null) continue;
 
             List<KeyValuePair<string, Sortings>> algorithmsToTest = specificAlg
-                                                                ? new List<KeyValuePair<string, Sortings>> { new KeyValuePair<string, Sortings>(currentAlgName, currentSortEnum) }
-                                                                : algorithmMap.ToList();
+                                                                  ? new List<KeyValuePair<string, Sortings>> { new KeyValuePair<string, Sortings>(currentAlgName, currentSortEnum) }
+                                                                  : algorithmMap.ToList();
 
             foreach (var algorithmEntry in algorithmsToTest)
             {
@@ -185,7 +189,6 @@ public class Program
                 long assignments = 0;
                 long swaps = 0;
 
-                // ManagerFileSorting.Ordenar agora espera os out parameters
                 comparisons = ManagerFileSorting.Ordenar(sortEnum, arrayToSort, out assignments, out swaps);
 
                 timer.Stop();
@@ -235,7 +238,7 @@ public class Program
             Console.WriteLine(new string('-', 105));
             fileNameSuffix = "_AssignmentsAndSwaps";
         }
-        else // MetricType.TimeOnly
+        else
         {
             headerFormat = "{0,-20} | {1,-25} | {2,-15}";
             lineFormat = "{0,-20} | {1,-25} | {2,-15}";
@@ -313,5 +316,75 @@ public class Program
             }
         }
         return true;
+    }
+
+    public static void RunQueueStackTest(string inputDirectory)
+    {
+        Console.WriteLine("\n--- Teste de Fila e Pilha Estáticas ---");
+        string filePath = Path.Combine(inputDirectory, "100-aleatorios.txt");
+
+        ReaderFile fileReader = new ReaderFile(filePath);
+        int[] numbers = fileReader.ReadNumbersToArray();
+
+        if (numbers == null || numbers.Length == 0)
+        {
+            Console.WriteLine("Não foi possível carregar números do arquivo 100-aleatorios.txt");
+            return;
+        }
+
+        Console.WriteLine($"\nCarregando {numbers.Length} números do arquivo: {filePath}");
+
+        Console.WriteLine("\n--- Teste de Fila Estática ---");
+        Fila fila = new Fila(numbers.Length + 5);
+        Console.WriteLine($"Capacidade inicial da Fila: {fila.fila.Length}");
+
+        foreach (int num in numbers)
+        {
+            fila.Inserir(num);
+        }
+        fila.Mostrar();
+
+        Console.WriteLine("\nFazendo algumas remoções na Fila:");
+        if (fila.cont > 0)
+        {
+            Console.WriteLine($"Removido: {fila.Remover()}");
+        }
+        if (fila.cont > 0)
+        {
+            Console.WriteLine($"Removido: {fila.Remover()}");
+        }
+        fila.Mostrar();
+
+        Console.WriteLine("\nFazendo algumas inserções extras na Fila:");
+        fila.Inserir(999);
+        fila.Inserir(888);
+        fila.Mostrar();
+
+
+        Console.WriteLine("\n--- Teste de Pilha Estática ---");
+        Pilha pilha = new Pilha(numbers.Length + 5);
+        Console.WriteLine($"Capacidade inicial da Pilha: {pilha.pilha.Length}");
+
+        foreach (int num in numbers)
+        {
+            pilha.Inserir(num);
+        }
+        pilha.Mostrar();
+
+        Console.WriteLine("\nFazendo algumas remoções na Pilha:");
+        if (pilha.topo != -1)
+        {
+            Console.WriteLine($"Removido: {pilha.Remover()}");
+        }
+        if (pilha.topo != -1)
+        {
+            Console.WriteLine($"Removido: {pilha.Remover()}");
+        }
+        pilha.Mostrar();
+
+        Console.WriteLine("\nFazendo algumas inserções extras na Pilha:");
+        pilha.Inserir(777);
+        pilha.Inserir(666);
+        pilha.Mostrar();
     }
 }
