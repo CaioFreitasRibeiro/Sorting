@@ -1,14 +1,15 @@
 ﻿using System.Diagnostics;
+using System;
 
 namespace Sorting.utils
 {
-    class UtilCountingTime
+    public class UtilCountingTime 
     {
-        Stopwatch stopwatch = new Stopwatch();
+        private Stopwatch stopwatch = new Stopwatch(); 
 
         public void Init()
         {
-            stopwatch.Start();
+            stopwatch.Restart(); 
         }
 
         public void Stop()
@@ -16,6 +17,9 @@ namespace Sorting.utils
             stopwatch.Stop();
         }
 
-
+        public long GetElapsedTime()
+        {
+            return stopwatch.ElapsedMilliseconds;
+        }
     }
 }

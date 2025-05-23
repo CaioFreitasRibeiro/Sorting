@@ -1,17 +1,18 @@
-﻿namespace Sorting.utils
+﻿using System;
+
+namespace Sorting.utils
 {
-    class UtilClonar
+    public static class UtilClonar
     {
-        public static int[] Clonar(int[] vet)
+        public static int[] CloneArray(int[] originalArray)
         {
-            int[] clone = new int[vet.Length];
-
-            for (int i = 0; i < vet.Length; i++)
+            if (originalArray == null)
             {
-                clone[i] = vet[i];
+                return null;
             }
-
-            return clone;
+            int[] clonedArray = new int[originalArray.Length];
+            Array.Copy(originalArray, clonedArray, originalArray.Length);
+            return clonedArray;
         }
     }
 }
