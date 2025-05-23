@@ -1,0 +1,17 @@
+Questão 05 -
+Vetor Original: {9, 7, 10, 8, 6, 2, 4, 3, 5, 1}
+a) Primeiro particionamento (pivô = primeiro elemento): {1, 7, 5, 8, 6, 2, 4, 3, 9, 10}
+
+b) Chamadas recursivas para {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}: 19 chamadas (pior caso, pivô no último elemento).
+
+c) Complexidade de tempo no pior caso: O(N)^2. As Partições desbalanceadas (ex: array já ordenado 
+com pivô sempre sendo o maior/menor elemento), levando a N etapas de particionamento de O(N).
+
+Questão 08 -
+- Tamanho Fixo: O principal problema é que a capacidade da estrutura (Fila, Pilha, Lista) é definida 
+  no momento da criação e não pode ser alterada em tempo de execução.
+- Desperdício de Memória (Over-allocation): Se o tamanho alocado for maior que o necessário, há memória não utilizada.
+- Overflow (Under-allocation): Se o número de elementos exceder o tamanho alocado, não é possível adicionar mais elementos, 
+  resultando em erro ou perda de dados.
+- Inserção/Remoção Ineficientes (para Listas e Filas baseadas em array): Inserir ou remover elementos no meio da lista ou 
+  no início da fila requer o deslocamento de muitos outros elementos, resultando em complexidade mathcalO(N).

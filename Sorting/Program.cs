@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 
 using Sorting.basic_class.@static;
+using Sorting.basic_class.dynamic;
 using Sorting.enums;
 using Sorting.manager;
 using Sorting.reader;
@@ -14,7 +15,7 @@ using Sorting.sorting.specials;
 
 public class Program
 {
-    private const string SPECIFIC_INPUT_FILE = "1000000-ordenados.txt";
+    private const string SPECIFIC_INPUT_FILE = "1000000-aleatorios.txt";
 
     public static void Main(string[] args)
     {
@@ -29,9 +30,9 @@ public class Program
         }
 
         string[] allInputFiles = Directory.GetFiles(inputDirectory, "*.txt")
-                                             .Select(Path.GetFileName)
-                                             .OrderBy(f => f)
-                                             .ToArray();
+                                            .Select(Path.GetFileName)
+                                            .OrderBy(f => f)
+                                            .ToArray();
 
         Dictionary<string, Sortings> algorithmMap = new Dictionary<string, Sortings>
         {
@@ -57,7 +58,9 @@ public class Program
             Console.WriteLine($"3. Contar Comparações para '{SPECIFIC_INPUT_FILE}' (tempo e comparações)");
             Console.WriteLine($"4. Contar Atribuições e Trocas para '{SPECIFIC_INPUT_FILE}' (tempo, atribuições e trocas)");
             Console.WriteLine("5. Testar Fila e Pilha Estáticas com '100-aleatorios.txt'");
-            Console.WriteLine("6. Sair");
+            Console.WriteLine("6. Testar Lista Estática e Ordenação com '1000000-aleatorios.txt'");
+            Console.WriteLine("7. Testar Fila, Pilha e Lista Dinâmicas e Ordenação");
+            Console.WriteLine("8. Sair");
 
             string choice = Console.ReadLine();
 
@@ -103,6 +106,14 @@ public class Program
             }
             else if (choice == "6")
             {
+                RunStaticListSortTest(inputDirectory);
+            }
+            else if (choice == "7")
+            {
+                RunDynamicStructuresTest(inputDirectory);
+            }
+            else if (choice == "8")
+            {
                 break;
             }
             else
@@ -135,7 +146,6 @@ public class Program
             currentFileName = inputFilesToTest[fileIndex - 1];
             inputFilesToTest = new string[] { currentFileName };
         }
-
 
         string currentAlgName = "";
         Sortings currentSortEnum = Sortings.BUBBLESORT;
@@ -171,8 +181,8 @@ public class Program
             if (originalArray == null) continue;
 
             List<KeyValuePair<string, Sortings>> algorithmsToTest = specificAlg
-                                                                  ? new List<KeyValuePair<string, Sortings>> { new KeyValuePair<string, Sortings>(currentAlgName, currentSortEnum) }
-                                                                  : algorithmMap.ToList();
+                                                                    ? new List<KeyValuePair<string, Sortings>> { new KeyValuePair<string, Sortings>(currentAlgName, currentSortEnum) }
+                                                                    : algorithmMap.ToList();
 
             foreach (var algorithmEntry in algorithmsToTest)
             {
@@ -336,7 +346,6 @@ public class Program
 
         Console.WriteLine("\n--- Teste de Fila Estática ---");
         Fila fila = new Fila(numbers.Length + 5);
-        Console.WriteLine($"Capacidade inicial da Fila: {fila.fila.Length}");
 
         foreach (int num in numbers)
         {
@@ -360,10 +369,8 @@ public class Program
         fila.Inserir(888);
         fila.Mostrar();
 
-
         Console.WriteLine("\n--- Teste de Pilha Estática ---");
         Pilha pilha = new Pilha(numbers.Length + 5);
-        Console.WriteLine($"Capacidade inicial da Pilha: {pilha.pilha.Length}");
 
         foreach (int num in numbers)
         {
@@ -386,5 +393,144 @@ public class Program
         pilha.Inserir(777);
         pilha.Inserir(666);
         pilha.Mostrar();
+    }
+
+    public static void RunStaticListSortTest(string inputDirectory)
+    {
+        Console.WriteLine("\n--- Teste de Lista Estática e Ordenação ---");
+        string filePath = Path.Combine(inputDirectory, "1000000-aleatorios.txt");
+
+        ReaderFile fileReader = new ReaderFile(filePath);
+        int[] numbers = fileReader.ReadNumbersToArray();
+
+        if (numbers == null || numbers.Length == 0)
+        {
+            Console.WriteLine("Não foi possível carregar números do arquivo 1000000-aleatorios.txt");
+            return;
+        }
+
+        Console.WriteLine($"\nCarregando {numbers.Length} números do arquivo para a Lista Estática...");
+        Lista listaEstatica = new Lista(numbers.Length);
+
+        foreach (int num in numbers)
+        {
+            listaEstatica.Inserir(num);
+        }
+
+        Console.WriteLine($"Lista Estática carregada com {listaEstatica.Size()} elementos.");
+
+        Console.WriteLine("\nConvertendo Lista Estática para array para ordenação...");
+        int[] arrayParaOrdenar = listaEstatica.ToArray();
+
+        Console.WriteLine("\nExecutando QuickSort na Lista Estática (convertida para array)...");
+        long assignments, swaps;
+        UtilCountingTime timer = new UtilCountingTime();
+        timer.Init();
+        long comparisons = QuickSort.Sort(arrayParaOrdenar, out assignments, out swaps);
+        timer.Stop();
+        long elapsedMs = timer.GetElapsedTime();
+
+        Console.WriteLine($"Ordenação concluída em {elapsedMs} ms.");
+        Console.WriteLine($"Comparações: {comparisons:N0}, Atribuições: {assignments:N0}, Trocas: {swaps:N0}");
+
+        if (IsSorted(arrayParaOrdenar))
+        {
+            Console.WriteLine("Array ordenado com sucesso!");
+        }
+        else
+        {
+            Console.WriteLine("ATENÇÃO: Array NÃO está ordenado após o QuickSort!");
+        }
+
+        listaEstatica.FromArray(arrayParaOrdenar);
+        Console.WriteLine("Lista Estática atualizada com os elementos ordenados.");
+    }
+
+    public static void RunDynamicStructuresTest(string inputDirectory)
+    {
+        Console.WriteLine("\n--- Teste de Fila, Pilha e Lista Dinâmicas e Ordenação ---");
+        string filePath = Path.Combine(inputDirectory, "1000000-aleatorios.txt");
+
+        ReaderFile fileReader = new ReaderFile(filePath);
+        int[] numbers = fileReader.ReadNumbersToArray();
+
+        if (numbers == null || numbers.Length == 0)
+        {
+            Console.WriteLine("Não foi possível carregar números do arquivo 1000000-aleatorios.txt");
+            return;
+        }
+
+        Console.WriteLine($"\nCarregando {numbers.Length} números do arquivo...");
+
+        Console.WriteLine("\n--- Teste de Fila Dinâmica ---");
+        FilaDinamica filaDinamica = new FilaDinamica();
+        foreach (int num in numbers)
+        {
+            filaDinamica.Inserir(num);
+        }
+        Console.WriteLine($"Fila Dinâmica carregada com {filaDinamica.Size()} elementos.");
+        //filaDinamica.Mostrar(); // Evitar para grandes volumes
+        Console.WriteLine("Fazendo algumas remoções na Fila Dinâmica:");
+        if (!filaDinamica.IsEmpty()) Console.WriteLine($"Removido: {filaDinamica.Remover()}");
+        if (!filaDinamica.IsEmpty()) Console.WriteLine($"Removido: {filaDinamica.Remover()}");
+        //filaDinamica.Mostrar();
+        Console.WriteLine("Fazendo algumas inserções extras na Fila Dinâmica:");
+        filaDinamica.Inserir(9999);
+        filaDinamica.Inserir(8888);
+        //filaDinamica.Mostrar();
+
+
+        Console.WriteLine("\n--- Teste de Pilha Dinâmica ---");
+        PilhaDinamica pilhaDinamica = new PilhaDinamica();
+        foreach (int num in numbers)
+        {
+            pilhaDinamica.Inserir(num);
+        }
+        Console.WriteLine($"Pilha Dinâmica carregada com {pilhaDinamica.Size()} elementos.");
+        //pilhaDinamica.Mostrar(); // Evitar para grandes volumes
+        Console.WriteLine("Fazendo algumas remoções na Pilha Dinâmica:");
+        if (!pilhaDinamica.IsEmpty()) Console.WriteLine($"Removido: {pilhaDinamica.Remover()}");
+        if (!pilhaDinamica.IsEmpty()) Console.WriteLine($"Removido: {pilhaDinamica.Remover()}");
+        //pilhaDinamica.Mostrar();
+        Console.WriteLine("Fazendo algumas inserções extras na Pilha Dinâmica:");
+        pilhaDinamica.Inserir(7777);
+        pilhaDinamica.Inserir(6666);
+        //pilhaDinamica.Mostrar();
+
+
+        Console.WriteLine("\n--- Teste de Lista Dinâmica e Ordenação ---");
+        ListaDinamica listaDinamica = new ListaDinamica();
+        foreach (int num in numbers)
+        {
+            listaDinamica.Inserir(num);
+        }
+        Console.WriteLine($"Lista Dinâmica carregada com {listaDinamica.Size()} elementos.");
+
+        Console.WriteLine("\nConvertendo Lista Dinâmica para array para ordenação...");
+        int[] arrayParaOrdenar = listaDinamica.ToArray();
+
+        Console.WriteLine("\nExecutando MergeSort na Lista Dinâmica (convertida para array)...");
+        long assignments, swaps;
+        UtilCountingTime timer = new UtilCountingTime();
+        timer.Init();
+        long comparisons = MergeSort.Sort(arrayParaOrdenar, out assignments, out swaps);
+        timer.Stop();
+        long elapsedMs = timer.GetElapsedTime();
+
+        Console.WriteLine($"Ordenação concluída em {elapsedMs} ms.");
+        Console.WriteLine($"Comparações: {comparisons:N0}, Atribuições: {assignments:N0}, Trocas: {swaps:N0}");
+
+        if (IsSorted(arrayParaOrdenar))
+        {
+            Console.WriteLine("Array ordenado com sucesso!");
+        }
+        else
+        {
+            Console.WriteLine("ATENÇÃO: Array NÃO está ordenado após o MergeSort!");
+        }
+
+        Console.WriteLine("\nAtualizando Lista Dinâmica com os elementos ordenados do array...");
+        listaDinamica.FromArray(arrayParaOrdenar);
+        Console.WriteLine("Lista Dinâmica atualizada com os elementos ordenados.");
     }
 }

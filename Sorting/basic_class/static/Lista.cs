@@ -1,17 +1,17 @@
 ﻿namespace Sorting.basic_class.@static
 {
-    class Lista
+    public class Lista
     {
         public int[] lista;
-        public int cont;
+        public int cont; // Contador de elementos
 
-        public Lista(int n)
+        public Lista(int capacidade)
         {
-            lista = new int[n];
+            lista = new int[capacidade];
             cont = 0;
         }
 
-        public bool InserirFim(int item)
+        public bool Inserir(int item)
         {
             if (cont < lista.Length)
             {
@@ -19,37 +19,90 @@
                 cont++;
                 return true;
             }
-            else
+            return false;
+        }
+
+        public bool InserirEmPosicao(int item, int posicao)
+        {
+            if (posicao < 0 || posicao > cont || cont == lista.Length)
             {
-                Console.WriteLine("Lista está cheia, não é possível inserir " + item);
                 return false;
             }
+            for (int i = cont; i > posicao; i--)
+            {
+                lista[i] = lista[i - 1];
+            }
+            lista[posicao] = item;
+            cont++;
+            return true;
         }
 
-        public bool InserirInicio(int item)
+        public int Remover(int posicao)
         {
-            return true;// implemente
+            if (posicao < 0 || posicao >= cont)
+            {
+                return -1; // Indica erro ou elemento não encontrado
+            }
+            int itemRemovido = lista[posicao];
+            for (int i = posicao; i < cont - 1; i++)
+            {
+                lista[i] = lista[i + 1];
+            }
+            cont--;
+            lista[cont] = 0; // Opcional: limpar a última posição
+            return itemRemovido;
         }
 
-        public bool InserirPosicao(int pos)
+        public int Get(int posicao)
         {
-            return true;// implemente
+            if (posicao < 0 || posicao >= cont)
+            {
+                throw new IndexOutOfRangeException("Posição inválida na lista.");
+            }
+            return lista[posicao];
         }
 
-        public int RemoverFim()
+        public int Size()
         {
-            return -1; // implemente
+            return cont;
         }
 
-        public int RemoverInicio()
+        public void Mostrar()
         {
-            return -1; // implemente
+            Console.Write("Lista: [");
+            for (int i = 0; i < cont; i++)
+            {
+                Console.Write(lista[i]);
+                if (i < cont - 1)
+                {
+                    Console.Write(", ");
+                }
+            }
+            Console.WriteLine("]");
         }
 
-        public int RemoverPosicao(int pos)
+        public int[] ToArray()
         {
-            return -1; // implemente
+            int[] tempArray = new int[cont];
+            Array.Copy(lista, 0, tempArray, 0, cont);
+            return tempArray;
         }
 
+        public void FromArray(int[] array)
+        {
+            if (array.Length > lista.Length)
+            {
+                // Tratar erro ou redimensionar se fosse dinâmica
+                Console.WriteLine("Erro: Array de entrada maior que a capacidade da lista estática.");
+                return;
+            }
+            Array.Copy(array, 0, lista, 0, array.Length);
+            cont = array.Length;
+            // Opcional: zerar o restante do array interno se cont < lista.Length
+            for (int i = cont; i < lista.Length; i++)
+            {
+                lista[i] = 0;
+            }
+        }
     }
 }
